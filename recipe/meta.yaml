@@ -9,7 +9,7 @@ source:
   sha256: eacb66afa65e0648fcbce5e746b135d09722231ffffc61883d4fac2b62fbea8d
 
 build:
-  number: 1
+  number: 0
   script: {{ PYTHON }} -m pip install . -vv
   entry_points:
     - uvicorn = uvicorn.main:main
