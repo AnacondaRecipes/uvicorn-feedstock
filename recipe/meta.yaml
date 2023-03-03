@@ -12,6 +12,14 @@ build:
   number: 0
   skip: true  # [py<38]
 
+requirements:
+  host:
+    - python
+    - pip
+    - hatchling
+    - setuptools
+    - wheel
+
 outputs:
   - name: uvicorn
     script: uvicorn_build.bat  # [win]
@@ -32,10 +40,10 @@ outputs:
         - click >=7.*
         - h11 >=0.8
     test:
-      requires:
-        - pip
       imports:
         - uvicorn
+      requires:
+        - pip
       commands:
         - pip check
         - uvicorn --help
@@ -51,12 +59,13 @@ outputs:
       run:
         - {{ pin_subpackage('uvicorn', exact=True) }}
         - colorama >=0.4  # [win]
-        # TODO: add httptools, websockets, watchfiles, and update uvloop
         - httptools >=0.5.0
         - python-dotenv >=0.13
         - PyYAML >=5.1
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
-        - watchfiles >=0.13
+        # TODO: add watchfiles for win-64.
+        # 2023/03/02: There were CI issues with building watchfiles on Windows related to python executables. 
+        - watchfiles >=0.13  # [not win]
         - websockets >=10.4
     test:
       requires:
@@ -64,7 +73,7 @@ outputs:
       commands:
         - pip check
       imports:
-        - uvicorn.supervisors.watchfilesreload  # [python_impl == "cpython"]
+        - uvicorn.supervisors.watchfilesreload
 
 about:
   home: https://github.com/encode/uvicorn
