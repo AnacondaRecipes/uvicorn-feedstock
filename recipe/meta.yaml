@@ -51,8 +51,8 @@ outputs:
   - name: uvicorn-standard
     build:
       skip: true  # [py<38]
-      # watchfiles is missing on s390x
-      skip: true  # [s390x]
+      # watchfiles is missing on s390x and win-64
+      skip: true  # [s390x or win]
     requirements:
       host:
         - python
