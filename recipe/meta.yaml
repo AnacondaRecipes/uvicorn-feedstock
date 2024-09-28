@@ -1,4 +1,4 @@
-{% set version = "0.20.0" %}
+{% set version = "0.25.0" %}
 
 package:
   name: uvicorn-split
@@ -6,53 +6,46 @@ package:
 
 source:
   url: https://pypi.io/packages/source/u/uvicorn/uvicorn-{{ version }}.tar.gz
-  sha256: a4e12017b940247f836bc90b72e725d7dfd0c8ed1c51eb365f5ba30d9f5127d8
+  sha256: 6dddbad1d7ee0f5140aba5ec138ddc9612c5109399903828b4874c9937f009c2
 
 build:
-  number: 0
   skip: true  # [py<38]
-
-requirements:
-  host:
-    - python
-    - pip
-    - hatchling
-    - setuptools
-    - wheel
+  number: 0
 
 outputs:
   - name: uvicorn
-    script: uvicorn_build.bat  # [win]
-    script: uvicorn_build.sh  # [not win]
+
     build:
-      skip: true  # [py<38]
       entry_points:
         - uvicorn = uvicorn.main:main
+    script: uvicorn_build.bat  # [win]
+    script: uvicorn_build.sh  # [not win]
+
     requirements:
+      build:
+        - python                                 # [build_platform != target_platform]
+        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
       host:
         - python
         - pip
         - hatchling
-        - setuptools
-        - wheel
       run:
         - python
-        - click >=7.*
+        - click >=7.0
         - h11 >=0.8
+        - typing_extensions >=4.0  # [py<311]
+
     test:
-      imports:
-        - uvicorn
       requires:
         - pip
+      imports:
+        - uvicorn
       commands:
         - pip check
         - uvicorn --help
 
   - name: uvicorn-standard
-    build:
-      skip: true  # [py<38]
-      # watchfiles is missing on s390x and win-64
-      skip: true  # [s390x or win]
+
     requirements:
       host:
         - python
@@ -60,22 +53,25 @@ outputs:
         - {{ pin_subpackage('uvicorn', exact=True) }}
       run:
         - {{ pin_subpackage('uvicorn', exact=True) }}
-        - colorama >=0.4  # [win]
+        - websockets >=10.4
         - httptools >=0.5.0
+        - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [python_impl == "cpython" and not win]
+        - colorama >=0.4  # [win]
+        - watchfiles >=0.13  # [python_impl == "cpython"]
+        # TODO: deprecated, when watchfiles available for pypy
+        - watchgod >=0.6  # [python_impl == "pypy"]
         - python-dotenv >=0.13
         - PyYAML >=5.1
-        - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
-        # TODO: add watchfiles for win-64.
-        # 2023/03/02: There were CI issues with building watchfiles on Windows related to python executables. 
-        - watchfiles >=0.13  # [not win]
-        - websockets >=10.4
+
     test:
       requires:
         - pip
       commands:
         - pip check
       imports:
-        - uvicorn.supervisors.watchfilesreload
+        - uvicorn.supervisors.watchfilesreload  # [python_impl == "cpython"]
+        # TODO: deprecated, when watchfiles available for pypy
+        - uvicorn.supervisors.watchgodreload  # [python_impl == "pypy"]
 
 about:
   home: https://github.com/encode/uvicorn
@@ -91,6 +87,11 @@ about:
   dev_url: https://github.com/encode/uvicorn
 
 extra:
+  anaconda-services:
+    ref: https://anaconda.zendesk.com/agent/tickets/49522
+    reason: Dependency for chainlit
+  recipe-maintainers:
+    - ianaobi
   feedstock-name: uvicorn
   recipe-maintainers:
     - carlodri
