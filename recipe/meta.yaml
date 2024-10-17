@@ -1,4 +1,4 @@
-{% set version = "0.20.0" %}
+{% set version = "0.30.6" %}
 
 package:
   name: uvicorn-split
@@ -17,8 +17,6 @@ requirements:
     - python
     - pip
     - hatchling
-    - setuptools
-    - wheel
 
 outputs:
   - name: uvicorn
@@ -39,6 +37,7 @@ outputs:
         - python
         - click >=7.*
         - h11 >=0.8
+        - typing_extensions >=4.0  # [py<311]
     test:
       imports:
         - uvicorn
@@ -67,7 +66,7 @@ outputs:
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
         # TODO: add watchfiles for win-64.
         # 2023/03/02: There were CI issues with building watchfiles on Windows related to python executables. 
-        - watchfiles >=0.13  # [not win]
+        - watchfiles >=0.13
         - websockets >=10.4
     test:
       requires:
