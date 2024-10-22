@@ -5,8 +5,8 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/u/uvicorn/uvicorn-{{ version }}.tar.gz
-  sha256: a4e12017b940247f836bc90b72e725d7dfd0c8ed1c51eb365f5ba30d9f5127d8
+  url: https://github.com/encode/uvicorn/archive/refs/tags/{{ version }}.tar.gz
+  sha256: 2b39d8391344132690e2cb96ba760bfc41e0fd577c70cf3bad210217704f1701
 
 build:
   number: 0
@@ -69,10 +69,20 @@ outputs:
         - watchfiles >=0.13
         - websockets >=10.4
     test:
+      source_files:
+        - pyproject.toml
+        - tests
       requires:
         - pip
+        - pytest
+        - pytest-mock
+        - httpx
+        - wsproto
+        #- trustme
       commands:
         - pip check
+        - pytest --ignore="tests/middleware/test_wsgi.py" --ignore="tests/test_server.py" --ignore="tests/supervisors/test_signal.py" -k "not (socket_bind or config_log_effective_level)"
+
       imports:
         - uvicorn.supervisors.watchfilesreload
 
