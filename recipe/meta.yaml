@@ -49,9 +49,7 @@ outputs:
 
   - name: uvicorn-standard
     build:
-      skip: true  # [py<38]
-      # watchfiles is missing on s390x and win-64
-      skip: true  # [s390x or win]
+      skip: true  # [py<38 or py>311]
     requirements:
       host:
         - python
@@ -64,8 +62,7 @@ outputs:
         - python-dotenv >=0.13
         - PyYAML >=5.1
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
-        - watchfiles >=0.13  # [py<312]
-        - watchfiles >=0.13  # [py>311 and not ((osx and x86) or linux64 or aarch64)]
+        - watchfiles >=0.13
         - websockets >=10.4
     test:
       source_files:
