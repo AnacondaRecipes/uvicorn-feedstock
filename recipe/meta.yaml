@@ -74,10 +74,18 @@ outputs:
         - pytest-mock
         - httpx
         - wsproto
-        #- trustme
+        - trustme
+
+      {% set pytest_ignore = '--ignore="tests/middleware/test_wsgi.py"' %}
+      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_signal.py"' %}
+      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/test_server.py"' %}
+
+      {% set pytest_skip = "socket_bind" %}
+      {% set pytest_skip = pytest_skip + " or config_log_effective_level" %}
+
       commands:
         - pip check
-        - pytest --ignore="tests/middleware/test_wsgi.py" --ignore="tests/test_server.py" --ignore="tests/supervisors/test_signal.py" -k "not (socket_bind or config_log_effective_level)"
+        - pytest {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
       imports:
         - uvicorn.supervisors.watchfilesreload
