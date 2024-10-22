@@ -64,9 +64,8 @@ outputs:
         - python-dotenv >=0.13
         - PyYAML >=5.1
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
-        # TODO: add watchfiles for win-64.
-        # 2023/03/02: There were CI issues with building watchfiles on Windows related to python executables. 
-        - watchfiles >=0.13  # [py<312 or not ((osx and x86) or linux64 or aarch64)]
+        - watchfiles >=0.13  # [py<312]
+        - watchfiles >=0.13  # [py>311 and not ((osx and x86) or linux64 or aarch64)]
         - websockets >=10.4
     test:
       source_files:
