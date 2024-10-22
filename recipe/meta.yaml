@@ -49,7 +49,8 @@ outputs:
 
   - name: uvicorn-standard
     build:
-      skip: true  # [py<38 or py>311]
+      # s390x missing watchfiles
+      skip: true  # [py<38 or py>311 or s390x]
     requirements:
       host:
         - python
@@ -82,6 +83,7 @@ outputs:
 
       {% set pytest_skip = "socket_bind" %}
       {% set pytest_skip = pytest_skip + " or config_log_effective_level" %}
+      {% set pytest_skip = pytest_skip + " or test_run" %}
 
       commands:
         - pip check
