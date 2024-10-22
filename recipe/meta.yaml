@@ -87,7 +87,7 @@ outputs:
 
       commands:
         - pip check
-        - pytest {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
+        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
       imports:
         - uvicorn.supervisors.watchfilesreload
