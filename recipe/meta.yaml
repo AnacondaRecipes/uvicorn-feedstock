@@ -87,7 +87,8 @@ outputs:
 
       commands:
         - pip check
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
+        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"  # [not (osx and x86)]
+        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})" -m "not reloader_class"  # [osx and x86]
 
       imports:
         - uvicorn.supervisors.watchfilesreload
