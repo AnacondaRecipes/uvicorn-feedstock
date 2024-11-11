@@ -31,8 +31,6 @@ outputs:
         - python
         - pip
         - hatchling
-        - setuptools
-        - wheel
       run:
         - python
         - click >=7.*
