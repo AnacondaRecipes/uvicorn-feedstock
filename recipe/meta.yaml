@@ -33,7 +33,7 @@ outputs:
         - hatchling
       run:
         - python
-        - click >=7.*
+        - click >=7.0
         - h11 >=0.8
         - typing_extensions >=4.0  # [py<311]
     test:
