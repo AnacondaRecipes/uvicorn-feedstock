@@ -72,6 +72,8 @@ outputs:
         - httpx
         - wsproto
         - trustme
+        # test_websocket imports from typing_extensions on all python versions
+        - typing_extensions >=4.0
 
       {% set pytest_ignore = '--ignore="tests/middleware/test_wsgi.py"' %}
       {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_signal.py"' %}
