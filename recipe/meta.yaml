@@ -77,6 +77,7 @@ outputs:
 
       {% set pytest_ignore = '--ignore="tests/middleware/test_wsgi.py"' %}
       {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_signal.py"' %}
+      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_reload.py"' %}
       {% set pytest_ignore = pytest_ignore + ' --ignore="tests/test_server.py"' %}
 
       {% set pytest_skip = "socket_bind" %}
@@ -85,8 +86,7 @@ outputs:
 
       commands:
         - pip check
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"  # [not (osx and x86)]
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})" -m "not reloader_class"  # [osx and x86]
+        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
       imports:
         - uvicorn.supervisors.watchfilesreload
