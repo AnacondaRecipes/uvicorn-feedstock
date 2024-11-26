@@ -1,4 +1,4 @@
-{% set version = "0.30.6" %}
+{% set version = "0.32.1" %}
 
 package:
   name: uvicorn-split
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/encode/uvicorn/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 2b39d8391344132690e2cb96ba760bfc41e0fd577c70cf3bad210217704f1701
+  sha256: fc494193b6cf58db1d732e93e1342ac069b6f7be7d01ad6a3c86b14a9fc3d28a
 
 build:
   number: 0
@@ -15,9 +15,6 @@ build:
 requirements:
   host:
     - python
-    - pip
-    - hatchling
-
 outputs:
   - name: uvicorn
     script: uvicorn_build.bat  # [win]
@@ -47,17 +44,17 @@ outputs:
 
   - name: uvicorn-standard
     build:
-      # s390x missing watchfiles
-      skip: true  # [py<38 or s390x]
+      skip: true  # [py<38]
     requirements:
       host:
         - python
         - pip
         - {{ pin_subpackage('uvicorn', exact=True) }}
       run:
+        - python
         - {{ pin_subpackage('uvicorn', exact=True) }}
         - colorama >=0.4  # [win]
-        - httptools >=0.5.0
+        - httptools >=0.6.3
         - python-dotenv >=0.13
         - PyYAML >=5.1
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
@@ -71,12 +68,16 @@ outputs:
         - pip
         - pytest
         - pytest-mock
-        - httpx
-        - wsproto
-        - trustme
+        # test deps not all built yet on s390x
+        - httpx       # [not s390x]
+        - wsproto     # [not s390x]
+        - trustme     # [not s390x]
+        # test_websocket imports from typing_extensions on all python versions
+        - typing_extensions >=4.0
 
       {% set pytest_ignore = '--ignore="tests/middleware/test_wsgi.py"' %}
       {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_signal.py"' %}
+      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_reload.py"' %}
       {% set pytest_ignore = pytest_ignore + ' --ignore="tests/test_server.py"' %}
 
       {% set pytest_skip = "socket_bind" %}
@@ -85,8 +86,7 @@ outputs:
 
       commands:
         - pip check
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"  # [not (osx and x86)]
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})" -m "not reloader_class"  # [osx and x86]
+        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})" # [not s390x]
 
       imports:
         - uvicorn.supervisors.watchfilesreload
