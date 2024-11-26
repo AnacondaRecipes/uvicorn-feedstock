@@ -44,8 +44,7 @@ outputs:
 
   - name: uvicorn-standard
     build:
-      # s390x missing watchfiles
-      skip: true  # [py<38 or s390x]
+      skip: true  # [py<38]
     requirements:
       host:
         - python
