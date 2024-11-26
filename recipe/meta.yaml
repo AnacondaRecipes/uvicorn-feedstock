@@ -68,9 +68,10 @@ outputs:
         - pip
         - pytest
         - pytest-mock
-        - httpx
-        - wsproto
-        - trustme
+        # test deps not all built yet on s390x
+        - httpx       # [not s390x]
+        - wsproto     # [not s390x]
+        - trustme     # [not s390x]
         # test_websocket imports from typing_extensions on all python versions
         - typing_extensions >=4.0
 
@@ -85,7 +86,7 @@ outputs:
 
       commands:
         - pip check
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
+        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})" # [not s390x]
 
       imports:
         - uvicorn.supervisors.watchfilesreload
