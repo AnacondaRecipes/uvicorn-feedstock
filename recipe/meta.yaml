@@ -1,16 +1,17 @@
-{% set version = "0.32.1" %}
+{% set name = "uvicorn" %}
+{% set version = "0.35.0" %}
 
 package:
-  name: uvicorn-split
+  name: {{ name|lower }}-split
   version: {{ version }}
 
 source:
-  url: https://github.com/encode/uvicorn/archive/refs/tags/{{ version }}.tar.gz
-  sha256: fc494193b6cf58db1d732e93e1342ac069b6f7be7d01ad6a3c86b14a9fc3d28a
+  url: https://github.com/encode/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: 61f096928e6cb320c58e577d0b38db62558d1f5ef13145ad1095350ef84f85e9
 
 build:
   number: 0
-  skip: true  # [py<38]
+  skip: true  # [py<39]
 
 requirements:
   host:
@@ -20,7 +21,7 @@ outputs:
     script: uvicorn_build.bat  # [win]
     script: uvicorn_build.sh  # [not win]
     build:
-      skip: true  # [py<38]
+      skip: true  # [py<39]
       entry_points:
         - uvicorn = uvicorn.main:main
     requirements:
@@ -36,6 +37,30 @@ outputs:
     test:
       imports:
         - uvicorn
+        - uvicorn
+        - uvicorn._subprocess
+        - uvicorn._types
+        - uvicorn.config
+        - uvicorn.importer
+        - uvicorn.lifespan.off
+        - uvicorn.lifespan.on
+        - uvicorn.logging
+        - uvicorn.loops.auto
+        - uvicorn.main
+        - uvicorn.middleware
+        - uvicorn.middleware.asgi2
+        - uvicorn.middleware.proxy_headers
+        - uvicorn.middleware.wsgi
+        - uvicorn.protocols.http.auto
+        - uvicorn.protocols.http.flow_control
+        - uvicorn.protocols.http.h11_impl
+        - uvicorn.protocols.utils
+        - uvicorn.protocols.websockets.auto
+        - uvicorn.server
+        - uvicorn.supervisors
+        - uvicorn.supervisors.basereload
+        - uvicorn.supervisors.multiprocess
+        - uvicorn.supervisors.statreload
       requires:
         - pip
       commands:
@@ -44,7 +69,7 @@ outputs:
 
   - name: uvicorn-standard
     build:
-      skip: true  # [py<38]
+      skip: true  # [py<39]
     requirements:
       host:
         - python
@@ -60,36 +85,39 @@ outputs:
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
         - watchfiles >=0.13
         - websockets >=10.4
+
+    # >       from websockets.server import ServerProtocol
+    # E       ImportError: cannot import name 'ServerProtocol' from 'websockets.server'
+    # https://github.com/python-websockets/websockets/blob/13.1/src/websockets/server.py#L48
+    # Needs websockets >=13.1
+    {% set ignore_tests = ' --ignore="tests/protocols/test_websocket.py"' %}
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_logging.py"' %}
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_message_logger.py"' %}
+    {% set tests_to_skip = " test_http2_upgrade_request " %}
+    {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
+    # Needs a2wsgi >=1.10.8
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_wsgi.py"' %}
+
     test:
       source_files:
         - pyproject.toml
         - tests
-      requires:
-        - pip
-        - pytest
-        - pytest-mock
-        # test deps not all built yet on s390x
-        - httpx       # [not s390x]
-        - wsproto     # [not s390x]
-        - trustme     # [not s390x]
-        # test_websocket imports from typing_extensions on all python versions
-        - typing_extensions >=4.0
-
-      {% set pytest_ignore = '--ignore="tests/middleware/test_wsgi.py"' %}
-      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_signal.py"' %}
-      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/supervisors/test_reload.py"' %}
-      {% set pytest_ignore = pytest_ignore + ' --ignore="tests/test_server.py"' %}
-
-      {% set pytest_skip = "socket_bind" %}
-      {% set pytest_skip = pytest_skip + " or config_log_effective_level" %}
-      {% set pytest_skip = pytest_skip + " or test_run" %}
-
-      commands:
-        - pip check
-        - pytest -v {{ pytest_ignore }} -k "not ({{ pytest_skip }})" # [not s390x]
-
       imports:
         - uvicorn.supervisors.watchfilesreload
+        - uvicorn.middleware.message_logger
+        - uvicorn.protocols.http.httptools_impl
+        - uvicorn.protocols.websockets.websockets_impl
+      commands:
+        - pip check
+        - pytest -v {{ ignore_tests }} -k "not ({{ tests_to_skip }})"
+      requires:
+        - pip
+        - pytest >=8.3.5
+        - pytest-mock >=3.14.0
+        - pytest-xdist >=3.6.1
+        - wsproto
+        - httpx >=0.28.1
+        - trustme >=1.2.1
 
 about:
   home: https://github.com/encode/uvicorn
@@ -101,7 +129,7 @@ about:
     Uvicorn is a lightning-fast ASGI server implementation,
     using [uvloop](https://github.com/MagicStack/uvloop) and
     [httptools](https://github.com/MagicStack/httptools).
-  doc_url: https://www.uvicorn.org/
+  doc_url: https://www.uvicorn.org
   dev_url: https://github.com/encode/uvicorn
 
 extra:
