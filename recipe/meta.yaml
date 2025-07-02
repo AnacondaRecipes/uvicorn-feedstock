@@ -97,6 +97,12 @@ outputs:
     {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
     # Needs a2wsgi >=1.10.8
     {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_wsgi.py"' %}
+    # E   OSError: [Errno 99] error while attempting to bind on address ('::1', 42109, 0, 0): cannot assign requested address
+    {% set tests_to_skip = tests_to_skip + " or test_run " %}  # [linux]
+    # E   AssertionError: assert None
+    # E    +  where None = _reload_tester(<function touch_soon.<locals>.start at 0x112907430>, <uvicorn.supervisors.watchfilesreload.WatchFilesReload object at 0x11244d220>, PosixPath('/private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/pytest-of-builder/pytest-923/popen-gw4/reload_directory0/app/sub/sub.py'))
+    #      +    where _reload_tester = <tests.supervisors.test_reload.TestBaseReload object at 0x1120d7130>._reload_tester
+    {% set tests_to_skip = tests_to_skip + " or test_should_reload_when_python_file_in_subdir_is_changed " %}  # [osx]
 
     test:
       source_files:
