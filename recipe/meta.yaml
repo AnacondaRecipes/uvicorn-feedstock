@@ -1,5 +1,5 @@
 {% set name = "uvicorn" %}
-{% set version = "0.35.0" %}
+{% set version = "0.29.0" %}
 
 package:
   name: {{ name|lower }}-split
@@ -7,11 +7,11 @@ package:
 
 source:
   url: https://github.com/encode/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 61f096928e6cb320c58e577d0b38db62558d1f5ef13145ad1095350ef84f85e9
+  sha256: b12a6866e7bc70fb89bd54c2d1a6b0382183657e369deed3a2d0535c280e46c9
 
 build:
   number: 0
-  skip: true  # [py<39]
+  skip: true  # [py<38]
 
 requirements:
   host:
@@ -21,7 +21,7 @@ outputs:
     script: uvicorn_build.bat  # [win]
     script: uvicorn_build.sh  # [not win]
     build:
-      skip: true  # [py<39]
+      skip: true  # [py<38]
       entry_points:
         - uvicorn = uvicorn.main:main
     requirements:
@@ -69,7 +69,7 @@ outputs:
 
   - name: uvicorn-standard
     build:
-      skip: true  # [py<39]
+      skip: true  # [py<38]
     requirements:
       host:
         - python
@@ -84,15 +84,14 @@ outputs:
         - PyYAML >=5.1
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
         - watchfiles >=0.13
-        - websockets >=10.4
+        - websockets >=10.4,<13  # needed to pin upper bound due to deprecation error
 
-    # >       from websockets.server import ServerProtocol
-    # E       ImportError: cannot import name 'ServerProtocol' from 'websockets.server'
-    # https://github.com/python-websockets/websockets/blob/13.1/src/websockets/server.py#L48
-    # Needs websockets >=13.1
-    {% set ignore_tests = ' --ignore="tests/protocols/test_websocket.py"' %}
+    {% set ignore_tests = '' %}
     {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_logging.py"' %}
     {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_message_logger.py"' %}
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/test_auto_detection.py"' %}
+    # Needs dependency on win
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_reload.py"' %}  # [win]
     {% set tests_to_skip = " test_http2_upgrade_request " %}
     {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
     # Needs a2wsgi >=1.10.8
@@ -103,6 +102,9 @@ outputs:
     # E    +  where None = _reload_tester(<function touch_soon.<locals>.start at 0x112907430>, <uvicorn.supervisors.watchfilesreload.WatchFilesReload object at 0x11244d220>, PosixPath('/private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/pytest-of-builder/pytest-923/popen-gw4/reload_directory0/app/sub/sub.py'))
     #      +    where _reload_tester = <tests.supervisors.test_reload.TestBaseReload object at 0x1120d7130>._reload_tester
     {% set tests_to_skip = tests_to_skip + " or TestBaseReload " %}  # [osx]
+    {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_trusted_hosts " %}
+    {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_multiple_proxies " %}
+    {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_invalid_x_forwarded_for " %}
 
     test:
       source_files:
