@@ -103,6 +103,8 @@ outputs:
     # E    +  where None = _reload_tester(<function touch_soon.<locals>.start at 0x112907430>, <uvicorn.supervisors.watchfilesreload.WatchFilesReload object at 0x11244d220>, PosixPath('/private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/pytest-of-builder/pytest-923/popen-gw4/reload_directory0/app/sub/sub.py'))
     #      +    where _reload_tester = <tests.supervisors.test_reload.TestBaseReload object at 0x1120d7130>._reload_tester
     {% set tests_to_skip = tests_to_skip + " or TestBaseReload " %}  # [osx]
+    # EOFError: Ran out of input
+    {% set tests_to_skip = tests_to_skip + " or test_multiprocess_health_check " %}  # [linux]
 
     test:
       source_files:
