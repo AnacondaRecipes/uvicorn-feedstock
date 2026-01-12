@@ -97,8 +97,8 @@ outputs:
     # tests/supervisors/test_multiprocess.py and tests/supervisors/test_reload.py are flaky on Windows and MacOS.
     # Exit code 0xC000013A (STATUS_CONTROL_C_EXIT) during pytest-xdist worker teardown, not during actual test execution. 
     # The 69% completion shows tests were passing, then cleanup timed out trying to terminate parallel workers.
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_multiprocess.py"' %}
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_reload.py"' %}
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_multiprocess.py"' %}  # [not linux]
+    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_reload.py"' %}  # [not linux]
 
     {% set tests_to_skip = " test_http2_upgrade_request " %}
     {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
