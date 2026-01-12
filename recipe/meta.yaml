@@ -127,7 +127,7 @@ outputs:
         - pip
         - pytest >=8.3.5
         - pytest-mock >=3.14.0
-        - pytest-xdist >=3.6.1
+        - pytest-xdist >=3.6.1  # [not win]
         - wsproto
         - httpx >=0.28.1
         - trustme >=1.2.1
