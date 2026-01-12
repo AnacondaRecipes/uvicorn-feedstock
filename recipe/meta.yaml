@@ -87,6 +87,7 @@ outputs:
         - websockets >=10.4
 
     {% set ignore_tests = '' %}
+    {% set tests_to_skip = '' %}
     # >       from websockets.server import ServerProtocol
     # E       ImportError: cannot import name 'ServerProtocol' from 'websockets.server'
     # https://github.com/python-websockets/websockets/blob/13.1/src/websockets/server.py#L48
@@ -100,7 +101,7 @@ outputs:
     {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_multiprocess.py"' %}  # [not linux]
     {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_reload.py"' %}  # [not linux]
 
-    {% set tests_to_skip = " test_http2_upgrade_request " %}
+    {% set tests_to_skip = tests_to_skip + " test_http2_upgrade_request " %}
     {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
     # Needs a2wsgi >=1.10.8
     {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_wsgi.py"' %}
