@@ -117,7 +117,12 @@ outputs:
         - uvicorn.protocols.websockets.websockets_impl
       commands:
         - pip check
-        - pytest -v {{ ignore_tests }} -k "not ({{ tests_to_skip }})"
+        - pytest -v {{ ignore_tests }} -k "not ({{ tests_to_skip }})"  # [not win]
+        # Exit code 0xC000013A (STATUS_CONTROL_C_EXIT) during pytest-xdist worker teardown, not during actual test execution. 
+        #The 69% completion shows tests were passing, then cleanup timed out trying to terminate parallel workers.
+        # Eliminating parallel worker cleanup issues entirely. 
+        # Single-process testing is more reliable on Windows for async codebases.
+        - pytest -v -n0 {{ ignore_tests }} -k "not ({{ tests_to_skip }})"  # [win]
       requires:
         - pip
         - pytest >=8.3.5
