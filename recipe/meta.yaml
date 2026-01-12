@@ -122,7 +122,7 @@ outputs:
         #The 69% completion shows tests were passing, then cleanup timed out trying to terminate parallel workers.
         # Eliminating parallel worker cleanup issues entirely. 
         # Single-process testing is more reliable on Windows for async codebases.
-        - pytest -v -n0 {{ ignore_tests }} -k "not ({{ tests_to_skip }})"  # [win]
+        - pytest -v {{ ignore_tests }} -k "not ({{ tests_to_skip }})"  # [win]
       requires:
         - pip
         - pytest >=8.3.5
