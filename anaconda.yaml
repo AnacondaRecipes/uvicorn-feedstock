@@ -7,6 +7,5 @@ upstream_sources:
       from_pattern: ^v?(\d+(?:\.\d+)*.*)$
       to_pattern: \1
     packages:
-      - uvicorn-split
       - uvicorn
       - uvicorn-standard
