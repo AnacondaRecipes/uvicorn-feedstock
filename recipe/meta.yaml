@@ -1,5 +1,18 @@
 {% set name = "uvicorn" %}
-{% set version = "0.40.0" %}
+{% set version = "0.52.4" %}
+{% set ignore_tests = "" %}
+{% set ignore_tests = ignore_tests + ' --ignore="tests/protocols/test_websocket.py"' %}
+{% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_logging.py"' %}
+{% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_message_logger.py"' %}
+{% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_multiprocess.py"' %}  # [not linux]
+{% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_reload.py"' %}  # [not linux]
+{% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_wsgi.py"' %}
+{% set tests_to_skip = "" %}
+{% set tests_to_skip = tests_to_skip + " test_http2_upgrade_request " %}
+{% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
+{% set tests_to_skip = tests_to_skip + " or test_run " %}  # [linux]
+{% set tests_to_skip = tests_to_skip + " or TestBaseReload " %}  # [osx]
+{% set tests_to_skip = tests_to_skip + " or test_multiprocess_health_check " %}  # [linux]
 
 package:
   name: {{ name|lower }}-split
@@ -7,7 +20,7 @@ package:
 
 source:
   url: https://github.com/encode/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 8718fbab752726670235c574d0f73f540aceca69e2692c2f2f8f2b1f8f0d6df5
+  sha256: 3531bbeb1cf4c829da28d17402feb1e2f73dccc49da8bbfbc148df2382c463a1
 
 build:
   number: 0
@@ -16,6 +29,7 @@ build:
 requirements:
   host:
     - python
+
 outputs:
   - name: uvicorn
     script: uvicorn_build.bat  # [win]
@@ -66,7 +80,6 @@ outputs:
       commands:
         - pip check
         - uvicorn --help
-
   - name: uvicorn-standard
     build:
       skip: true  # [py<39]
@@ -85,35 +98,19 @@ outputs:
         - uvloop >=0.14.0,!=0.15.0,!=0.15.1  # [not win]
         - watchfiles >=0.13
         - websockets >=10.4
-
-    {% set ignore_tests = '' %}
-    {% set tests_to_skip = '' %}
     # >       from websockets.server import ServerProtocol
     # E       ImportError: cannot import name 'ServerProtocol' from 'websockets.server'
     # https://github.com/python-websockets/websockets/blob/13.1/src/websockets/server.py#L48
     # Needs websockets >=13.1
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/protocols/test_websocket.py"' %}
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_logging.py"' %}
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_message_logger.py"' %}
     # tests/supervisors/test_multiprocess.py and tests/supervisors/test_reload.py are flaky on Windows and MacOS.
-    # Exit code 0xC000013A (STATUS_CONTROL_C_EXIT) during pytest-xdist worker teardown, not during actual test execution. 
+    # Exit code 0xC000013A (STATUS_CONTROL_C_EXIT) during pytest-xdist worker teardown, not during actual test execution.
     # The 69% completion shows tests were passing, then cleanup timed out trying to terminate parallel workers.
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_multiprocess.py"' %}  # [not linux]
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/supervisors/test_reload.py"' %}  # [not linux]
-
-    {% set tests_to_skip = tests_to_skip + " test_http2_upgrade_request " %}
-    {% set tests_to_skip = tests_to_skip + " or test_proxy_headers_websocket_x_forwarded_proto " %}
     # Needs a2wsgi >=1.10.8
-    {% set ignore_tests = ignore_tests + ' --ignore="tests/middleware/test_wsgi.py"' %}
     # E   OSError: [Errno 99] error while attempting to bind on address ('::1', 42109, 0, 0): cannot assign requested address
-    {% set tests_to_skip = tests_to_skip + " or test_run " %}  # [linux]
     # E   AssertionError: assert None
     # E    +  where None = _reload_tester(<function touch_soon.<locals>.start at 0x112907430>, <uvicorn.supervisors.watchfilesreload.WatchFilesReload object at 0x11244d220>, PosixPath('/private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/pytest-of-builder/pytest-923/popen-gw4/reload_directory0/app/sub/sub.py'))
     #      +    where _reload_tester = <tests.supervisors.test_reload.TestBaseReload object at 0x1120d7130>._reload_tester
-    {% set tests_to_skip = tests_to_skip + " or TestBaseReload " %}  # [osx]
     # EOFError: Ran out of input
-    {% set tests_to_skip = tests_to_skip + " or test_multiprocess_health_check " %}  # [linux]
-
     test:
       source_files:
         - pyproject.toml
