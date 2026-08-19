@@ -152,7 +152,7 @@ about:
     Uvicorn is a lightning-fast ASGI server implementation,
     using [uvloop](https://github.com/MagicStack/uvloop) and
     [httptools](https://github.com/MagicStack/httptools).
-  doc_url: https://www.uvicorn.org
+  doc_url: https://uvicorn.dev
   dev_url: https://github.com/encode/uvicorn
 
 extra:
@@ -161,3 +161,5 @@ extra:
     - carlodri
     - ocefpaf
     - xhochy
+  slip-lints:
+    - missing_imports_or_run_test_py
