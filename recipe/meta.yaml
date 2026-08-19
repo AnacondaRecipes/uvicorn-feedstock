@@ -161,5 +161,5 @@ extra:
     - carlodri
     - ocefpaf
     - xhochy
-  slip-lints:
+  skip-lints:
     - missing_imports_or_run_test_py
